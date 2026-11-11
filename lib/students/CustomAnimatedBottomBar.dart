@@ -1,28 +1,30 @@
+import 'package:campusconnection/students/student_home.dart';
 import 'package:flutter/material.dart';
 
+// 1. Custom Floating Animated Bottom Bar
 class CustomAnimatedBottomBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
-  final Color accentColor;
+  
+  final Color primaryColor = const Color(0xFF0A192F); // Dark Navy Blue
+  final Color accentColor = const Color(0xFFD4AF37);  // Golden Yellow
 
   const CustomAnimatedBottomBar({
     super.key,
     required this.selectedIndex,
     required this.onItemSelected,
-    this.accentColor = const Color(0xFF8E24AA), // Purple
   });
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double maxBarWidth = 600.0;
+    double maxBarWidth = 650.0;
     double barWidth = screenWidth > maxBarWidth ? maxBarWidth : screenWidth;
 
     return Align(
       alignment: Alignment.bottomCenter,
-      // ഇവിടെയാണ് പ്രധാന മാറ്റം. Material വിജറ്റ് നൽകിയിരിക്കുന്നു.
       child: Material(
-        color: Colors.transparent, // പുറകിലെ നിറം ട്രാൻസ്പരന്റ് ആക്കുന്നു
+        color: Colors.transparent,
         child: Container(
           width: barWidth,
           margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
@@ -31,17 +33,18 @@ class CustomAnimatedBottomBar extends StatelessWidget {
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
             children: [
-              // 1. The Background Bar
+              // Background Bar (Home, Courses, Placements, Contact)
               Container(
                 height: 65,
                 decoration: BoxDecoration(
-                  color: accentColor,
+                  color: primaryColor,
                   borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: accentColor.withOpacity(0.5), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: accentColor.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      color: primaryColor.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -49,38 +52,38 @@ class CustomAnimatedBottomBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Expanded(child: _buildNavItem(context, 0, Icons.home, "Home")),
-                    Expanded(child: _buildNavItem(context, 1, Icons.info_outline, "About")),
-                    const Spacer(flex: 2), // Center button-ന് വേണ്ടിയുള്ള സ്പേസ്
-                    Expanded(child: _buildNavItem(context, 2, Icons.contact_support, "Contact")),
-                    Expanded(child: _buildNavItem(context, 3, Icons.dashboard, "Dashboard")),
+                    Expanded(child: _buildNavItem(context, 1, Icons.school, "Courses")),
+                    const Spacer(flex: 2), // Space for center floating button
+                    Expanded(child: _buildNavItem(context, 3, Icons.business, "Placements")),
+                    Expanded(child: _buildNavItem(context, 4, Icons.contact_mail, "Contact")),
                   ],
                 ),
               ),
               
-              // 2. The Floating Center Button
+              // Floating Center Button (Career Page - Index 2)
               Positioned(
                 top: 0,
                 child: GestureDetector(
-                  onTap: () => onItemSelected(4),
+                  onTap: () => onItemSelected(2), // 2-ാമത്തെ ഇൻഡക്സ് Career Page-ന്
                   child: Container(
                     height: 65,
                     width: 65,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: accentColor,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: accentColor.withOpacity(0.3),
+                          color: accentColor.withOpacity(0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
                       ],
-                      border: Border.all(color: accentColor, width: 4),
+                      border: Border.all(color: primaryColor, width: 4),
                     ),
                     child: Center(
                       child: Icon(
-                        Icons.person, 
-                        color: accentColor,
+                        Icons.work_outline, // Career Icon
+                        color: primaryColor,
                         size: 30,
                       ),
                     ),
@@ -99,7 +102,7 @@ class CustomAnimatedBottomBar extends StatelessWidget {
 
     return InkWell(
       onTap: () => onItemSelected(index),
-      splashColor: Colors.white.withOpacity(0.2), // ക്ലിക്ക് ചെയ്യുമ്പോൾ വരുന്ന നിറം
+      splashColor: accentColor.withOpacity(0.2),
       highlightColor: Colors.transparent,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -108,25 +111,70 @@ class CustomAnimatedBottomBar extends StatelessWidget {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
+              color: isSelected ? accentColor.withOpacity(0.25) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.white70,
-              size: 24,
+              color: isSelected ? accentColor : Colors.white70,
+              size: 22,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white70,
+              color: isSelected ? accentColor : Colors.white70,
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 2. Main Screen with Stack to hold Pages and Floating Bottom Bar
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  // 5 വ്യത്യസ്ത പേജുകൾ (Home, Courses, Career, Placements, Contact)
+  final List<Widget> _pages = [
+    StudentHomeScreen(),
+    Container(color: Colors.green.shade50, child: const Center(child: Text("Courses Page", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)))),
+    Container(color: Colors.amber.shade50, child: const Center(child: Text("Career Page", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)))),
+    Container(color: Colors.purple.shade50, child: const Center(child: Text("Placements Page", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)))),
+    Container(color: Colors.red.shade50, child: const Center(child: Text("Contact Page", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)))),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // ഫുൾ സ്‌ക്രീൻ പേജ് ഡിസ്‌പ്ലേ ചെയ്യാൻ Positioned.fill ഉപയോഗിച്ചിരിക്കുന്നു
+          Positioned.fill(
+            child: _pages[_currentIndex],
+          ),
+          
+          // താഴെ ഫ്ലോട്ട് ചെയ്ത് നിൽക്കുന്ന Custom Animated Bottom Bar
+          CustomAnimatedBottomBar(
+            selectedIndex: _currentIndex,
+            onItemSelected: (index) {
+              setState(() {
+                _currentIndex = index; // ഏത് ഐക്കണിൽ/സെന്റർ ബട്ടണിൽ അമർത്തിയാലും കറക്റ്റായ പേജ് മാറും
+              });
+            },
           ),
         ],
       ),
