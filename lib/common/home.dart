@@ -14,6 +14,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _heroController;
   late AnimationController _statsController;
   late AnimationController _cardsController;
+  late AnimationController _disciplinesController;
 
   @override
   void initState() {
@@ -34,6 +35,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 1000), 
     );
 
+    _disciplinesController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200), 
+    );
+
     _startAnimations();
   }
 
@@ -43,6 +49,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _statsController.forward();
     await Future.delayed(const Duration(milliseconds: 200));
     _cardsController.forward();
+    await Future.delayed(const Duration(milliseconds: 200));
+    _disciplinesController.forward();
   }
 
   @override
@@ -50,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _heroController.dispose();
     _statsController.dispose();
     _cardsController.dispose();
+    _disciplinesController.dispose();
     super.dispose();
   }
 
@@ -61,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 1. HERO SECTION
             FadeTransition(
               opacity: _heroController,
               child: SlideTransition(
@@ -70,12 +80,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
 
+            // 2. STATS SECTION
             ScaleTransition(
               scale: CurvedAnimation(parent: _statsController, curve: Curves.easeOutBack),
               child: _buildStatsSection(),
             ),
 
+            // 3. WHY CHOOSE US SECTION
             _buildWhyChooseSection(),
+
+            // 4. NEW: OUR DIPLOMA DISCIPLINES SECTION
+            _buildDisciplinesSection(),
             
             const SizedBox(height: 120), 
           ],
@@ -84,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // --- HERO SECTION ---
   Widget _buildHeroSection() {
     return SizedBox(
       height: 440,
@@ -166,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // --- STATS SECTION ---
   Widget _buildStatsSection() {
     return Container(
       color: primaryNavy,
@@ -205,6 +222,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Container(height: 35, width: 1, color: Colors.white24);
   }
 
+  // --- WHY CHOOSE US SECTION ---
   Widget _buildWhyChooseSection() {
     return Padding(
       padding: const EdgeInsets.only(top: 40.0),
@@ -226,7 +244,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 30),
           
-          // Overflow പരിഹരിക്കാൻ കാർഡിന്റെ ഉയരം 250 ആക്കി മാറ്റി
           SizedBox(
             height: 250, 
             child: ListView(
@@ -246,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  // കാർഡുകൾക്കുള്ള അനിമേഷൻ വിഡ്ജറ്റ്
   Widget _buildAnimatedCard(int index, IconData icon, String title, String description) {
     final Animation<double> animation = CurvedAnimation(
       parent: _cardsController,
@@ -265,7 +281,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           width: 210,
           margin: const EdgeInsets.only(right: 16, bottom: 10),
           decoration: BoxDecoration(
-            // സ്ക്രീൻഷോട്ടിലെ പോലെ തിളങ്ങുന്ന കടുംനീല ഗ്രേഡിയന്റ്
             gradient: LinearGradient(
               colors: [const Color(0xFF1E3A68), const Color(0xFF0F2547)], 
               begin: Alignment.topLeft,
@@ -304,31 +319,143 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Text(
                       title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15, 
-                        fontWeight: FontWeight.bold, 
-                        height: 1.3,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, height: 1.3),
                     ),
                     const SizedBox(height: 8),
-                    // Expanded ഉപയോഗിച്ച് ടെക്സ്റ്റ് Overflow ആകാതെ നോക്കുന്നു
                     Expanded(
                       child: Text(
                         description,
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 5,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 11.5, 
-                          height: 1.4,
-                        ),
+                        style: const TextStyle(color: Colors.white70, fontSize: 11.5, height: 1.4),
                       ),
                     ),
                   ],
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- 4. NEW: OUR DIPLOMA DISCIPLINES SECTION (Image 2 Design) ---
+  Widget _buildDisciplinesSection() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 50.0, bottom: 20.0),
+      child: Column(
+        children: [
+          const Text(
+            "Our Diploma Disciplines",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Color(0xFF0F2547), fontSize: 22, fontWeight: FontWeight.w900, height: 1.2),
+          ),
+          const SizedBox(height: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30.0),
+            child: Text(
+              "Three-year comprehensive technical diploma programs approved by AICTE and affiliated to SBTE Kerala.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontSize: 12, height: 1.5),
+            ),
+          ),
+          const SizedBox(height: 30),
+          
+          SizedBox(
+            height: 250, 
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              physics: const BouncingScrollPhysics(),
+              children: [
+                _buildDisciplineCard(0, "Mechanical & Automobile\nEngineering", "Hands-on training in automotive mechanics, thermal engineering, workshop fabrication, and modern CAD/CAM computer design."),
+                _buildDisciplineCard(1, "Computer Engineering", "Comprehensive foundation in software development, computer networking, hardware maintenance, and data communication."),
+                _buildDisciplineCard(2, "Electrical, Civil & Safety\nEngineering", "Specialized streams covering power systems, structural drafting, construction technology, and industrial Fire Technology & Safety."),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // പുതിയ കാർഡ് ഡിസൈൻ (വെളുത്ത ബാക്ക്ഗ്രൗണ്ട്, ഇടതുവശത്ത് മഞ്ഞ ലൈൻ)
+  Widget _buildDisciplineCard(int index, String title, String description) {
+    final Animation<double> animation = CurvedAnimation(
+      parent: _disciplinesController,
+      curve: Interval(
+        index * 0.15, 
+        1.0,
+        curve: Curves.easeOutQuart,
+      ),
+    );
+
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0.2, 0), end: Offset.zero).animate(animation), // വലത്തുനിന്ന് ഇടത്തോട്ട് വരാൻ
+        child: Container(
+          width: 260, // കാർഡിന് അൽപ്പം കൂടി വീതി നൽകി
+          margin: const EdgeInsets.only(right: 16, bottom: 10),
+          decoration: BoxDecoration(
+            color: Colors.white, // വെളുത്ത ബാക്ക്ഗ്രൗണ്ട്
+            borderRadius: BorderRadius.circular(12), // റൗണ്ടഡ് കോർണർ
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          // ഇടതുവശത്ത് മഞ്ഞ ബോർഡർ ലൈൻ നൽകാൻ Row ഉപയോഗിക്കുന്നു
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // മഞ്ഞ ലൈൻ
+                Container(
+                  width: 5,
+                  color: accentGold,
+                ),
+                // കാർഡിന്റെ കണ്ടെന്റ്
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Color(0xFF0F2547), // കടുംനീല ടെക്സ്റ്റ്
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: Text(
+                            description,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 6,
+                            style: const TextStyle(
+                              color: Colors.grey, // ഗ്രേ ഡിസ്ക്രിപ്ഷൻ
+                              fontSize: 12,
+                              height: 1.6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
